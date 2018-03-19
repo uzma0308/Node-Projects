@@ -1,0 +1,24 @@
+{
+  "name": "chatapp",
+  "version": "1.0.0",
+  "description": "Simple Chat app",
+  "main": "server.js",
+  "scripts": {
+    "test": "test ",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "node"
+  ],
+  "author": "jay",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "express-fileupload": "^0.1.4",
+    "mongo-sync": "^2.0.1",
+    "mongoose": "^4.11.6",
+    "nodemon": "^1.11.0",
+    "socket.io": "^2.0.3"
+  }
+}

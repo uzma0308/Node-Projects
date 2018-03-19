@@ -1,0 +1,313 @@
+<html>
+    <head>
+         <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+        <style>
+            .chat-box {
+                    float: left;
+                    height: 300px;
+                    width: 400px;
+                    border: 1px solid gray;
+                    border-radius: 10px;
+                    margin-bottom: 10px;
+                    overflow-y: scroll;
+                    padding: 5px;
+                    background: rgba(0, 184, 255, 0.12);
+            }
+            .form-box{
+                width: 400px;
+                border: 1px solid gray;
+                border-radius: 10px;
+                padding: 10px;
+                background: gray;
+                float: left;
+            }
+            .form-box:after{
+                content: '';
+                display: block;
+                clear: both;
+            }
+            .form-box input {
+                width: 80%;
+                padding: 5px;
+                float: left;
+            }
+
+            .form-box button {
+                width: 20%;
+                padding: 5px;
+                background: #00adff;
+                color: #fff;
+                border: none;
+                letter-spacing: 1px;
+                font-size: 14px;
+                cursor: pointer;
+                float: left;
+            }
+            .chat-box li {
+                list-style: none;
+                display: block;
+                /* width: 100%; */
+                padding: 7px;
+                /* background: #ddd; */
+                margin: 8px 0;
+                border-radius: 5px;
+            }
+            .chat-box li:nth-child(even){
+                background: #eee;
+            }
+            .chat-box li:nth-child(odd){
+                background: #fff;
+            }
+            .online-users {
+                float: left;
+                height: 300px;
+                width: 200px;
+                border: 1px solid gray;
+                border-radius: 10px;
+                margin-bottom: 10px;
+                overflow-y: scroll;
+                padding: 5px;
+                background: rgba(115, 120, 121, 0.12);
+            }
+            .online-users li{
+                    list-style: none;
+                    padding: 5px 0;
+                    background: rgba(255, 118, 0, 0.25);
+                    margin: 4px 0;
+                    border-radius: 4px;
+                    font-family: cursive;
+            }
+            .online-users li:before{
+                content: '';
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                background-size: 100%;
+                vertical-align: middle;
+                margin-right: 4px;
+                background-image: url(http://192.168.1.156:8000/Images/online.ico);
+            }
+            .chat-box-wrapper:after {
+                display: block;
+                content: '';
+                clear: both;
+            }
+            .chatbox-header {
+                position: relative;
+            }
+
+            .new-arrival {
+                position: absolute;
+                top: 0;
+                right: 0;
+                background: #eee;
+                width: 150px;
+                height: auto;
+                padding: 10px;
+            }
+            .shareit {
+                float: left;
+                background: rgba(0, 220, 255, 0.57);
+                padding: 14px 10px;
+                border-radius: 10px;
+                text-align: center;
+            }
+
+            .form-wrapper:after {
+                content: '';
+                display: block;
+                clear: both;
+            }
+        </style>
+        
+    </head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+    var socket = io();
+    </script>
+    <body>
+        <div class="chat-box-wrapper">
+                <div class="chat-box">
+                    <div class="chatbox-header">
+                         <h3>Chat Area</h3>
+                         <div class="new-arrival"></div>
+                    </div>
+                   
+                </div>
+                <div class="online-users">
+                    <h3>Online users</h3>
+                </div>
+        </div>
+        <div class="form-wrapper"> 
+            <div class="form-box">
+                <input type="text"/ id="message" placeholder="type your message...">
+                <button class="send-btn">Send</button>
+            </div>
+            <div class="shareit">
+                <input type="file" name="myFile" id="fileInput"/>
+            </div>
+        </div>
+        <script>
+            //My Ip
+            /**
+             * Get the user IP throught the webkitRTCPeerConnection
+             * @param onNewIP {Function} listener function to expose the IP locally
+             * @return undefined
+             */
+            
+            function getUserIP(onNewIP) { //  onNewIp - your listener function for new IPs
+                //compatibility for firefox and chrome
+                var myPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+                var pc = new myPeerConnection({
+                    iceServers: []
+                }),
+                noop = function() {},
+                localIPs = {},
+                ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g,
+                key;
+
+                function iterateIP(ip) {
+                    if (!localIPs[ip]) onNewIP(ip);
+                    localIPs[ip] = true;
+                }
+
+                //create a bogus data channel
+                pc.createDataChannel("");
+
+                // create offer and set local description
+                pc.createOffer(function(sdp) {
+                    sdp.sdp.split('\n').forEach(function(line) {
+                        if (line.indexOf('candidate') < 0) return;
+                        line.match(ipRegex).forEach(iterateIP);
+                    });
+                    
+                    pc.setLocalDescription(sdp, noop, noop);
+                }, noop); 
+
+                //listen for candidate events
+                pc.onicecandidate = function(ice) {
+                    if (!ice || !ice.candidate || !ice.candidate.candidate || !ice.candidate.candidate.match(ipRegex)) return;
+                    ice.candidate.candidate.match(ipRegex).forEach(iterateIP);
+                };
+            }
+
+            $(document).ready(function(){
+                do{
+                        person = prompt("Please enter your name");
+                    }while(person == null || person == "" );
+                    
+                    // $(".chat-box").animate({
+                    // scrollTop: $('.chat-box')[0].scrollHeight - $('.chat-box')[0].clientHeight
+                    // }, 1000);
+
+                    // getting online users
+                        $.ajax(
+                            {
+                            url: "http://192.168.0.105:8000/getOnlineUsers", 
+                            method:'POST',
+
+                            success: function(result){
+                                 console.log(result);
+                                 var str='<h3>Online Users</h3>';
+                                 for(var i=0;i<result.length;i++){
+                                    str+="<li>"+result[i].name+"</li>";
+                                 }
+                                $('.online-users').html(str);
+                            },
+                            error:function(){
+                                console.log("Something wrong");
+                            }
+                        });
+                    //ending online users
+                    //getting IP 
+                    
+                      getUserIP(function(ip){
+                                myIp=ip;
+                                console.log(myIp);
+                                var usrDetail = {name:person,ip:myIp,emp_id:100};
+                                socket.emit('user_connected',usrDetail);
+                        });
+                    
+                    
+                     
+
+                $('.send-btn').click(function(){
+                    
+
+                    var value = $('#message').val();
+                    if(value!=''){
+                        socket.emit('chat_message',person+" says : "+value);
+                        $('#message').val('');
+                    }
+
+                    // $(".chat-box").animate({
+                    // scrollTop: $('.chat-box')[0].scrollHeight - $('.chat-box')[0].clientHeight
+                    // }, 1000);
+                });
+
+                $(document).keydown(function(event){
+                    
+
+                    if(event.keyCode==13){
+                        var value = $('#message').val();
+                        if(value!=''){
+                            socket.emit('chat_message',person+" says : "+value);
+                            $('#message').val('');
+                        }
+                    }
+
+                    // $(".chat-box").animate({
+                    // scrollTop: $('.chat-box')[0].scrollHeight - $('.chat-box')[0].clientHeight
+                    // }, 1000);
+                });
+
+                socket.on('chat_message', function(msg){
+                    $('.chat-box').append($('<li>').text(msg));
+                    $('new-arrival').addClass('new');
+                });
+
+                socket.on('prev_msg', function(msg){
+                    for(var i =0;i<msg.length;i++)
+                    {
+                        $('.chat-box').append($('<li>').text(msg[i]));
+                    }
+                    
+                });
+
+                 socket.on('online_user', function(result){
+                    var str='<h3>Online Users</h3>';
+                    for(var i=0;i<result.length;i++){
+                        str+="<li>"+result[i].name+"</li>";
+                    }
+                    $('.online-users').html(str);
+                    
+                });
+
+                socket.on('userImage',function(response){
+                    console.log(response);
+                    $('.chat-box').append("<img>"+response+"</img>");
+                });
+
+                //file upload
+                $('#fileInput').change(function(e){
+                    //Get the first (and only one) file element
+                    //that is included in the original event
+                    var file = e.originalEvent.target.files[0],
+                        reader = new FileReader();
+                    //When the file has been read...
+                    reader.onload = function(evt){
+                        //Because of how the file was read,
+                        //evt.target.result contains the image in base64 format
+                        //Nothing special, just creates an img element
+                        //and appends it to the DOM so my UI shows
+                        //that I posted an image.
+                        //send the image via Socket.io
+                        socket.emit('userImage', evt.target.result);
+                    };
+                    //And now, read the image and base64
+                    reader.readAsDataURL(file); 
+                });
+            });
+        </script>
+    </body>
+</html>

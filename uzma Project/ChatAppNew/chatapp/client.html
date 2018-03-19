@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='utf-8'>  
+         <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+        <style>
+            .chat-wrapper{
+                float: left;
+                height: 300px;
+                width: 400px;
+                border: 1px solid gray;
+                border-radius: 10px;
+                margin-bottom: 10px;
+                padding: 5px;
+                background: rgba(0, 184, 255, 0.12);
+            }
+            .chat-box {
+                overflow-y: scroll;
+                width: 96%;
+                height: 68%;
+                background: #81a991;
+                padding: 0 10px;
+                margin-top: 10px;
+                border-radius: 10px;
+                border-top: 10px solid #81a991;
+                border-bottom: 10px solid #81a991;
+            }
+            .form-box{
+                width: 400px;
+                border: 1px solid gray;
+                border-radius: 10px;
+                padding: 10px;
+                background: gray;
+                float: left;
+                position: relative;
+            }
+            .form-box:after{
+                content: '';
+                display: block;
+                clear: both;
+            }
+            .form-box input {
+                width: 72%;
+                padding: 5px;
+                float: left;
+            }
+
+            .form-box .send-btn {
+                width: 16%;
+                padding: 5px;
+                background: #00adff;
+                color: #fff;
+                border: none;
+                letter-spacing: 1px;
+                font-size: 14px;
+                cursor: pointer;
+                float: left;
+            }
+            .form-box .emoji{
+                float: left;
+                width: 7%;
+                height: 27px;
+                font-size: 14px;
+                line-height: 1;
+                padding: 0;
+                text-align: center;
+                cursor: pointer;
+            }
+            .chat-box li {
+                list-style: none;
+                display: block;
+                /* width: 100%; */
+                padding: 7px;
+                /* background: #ddd; */
+                margin: 8px 0;
+                border-radius: 5px;
+            }
+            .chat-box li:nth-child(even){
+                background: #eee;
+            }
+            .chat-box li:nth-child(odd){
+                background: #fff;
+            }
+            .online-users {
+                height: 75%;
+                width: 100%;
+                overflow-y: scroll;
+                
+            }
+            .online-user-wrapper {
+                float: left;
+                height: 300px;
+                width: 200px;
+                border: 1px solid gray;
+                border-radius: 10px;
+                margin-bottom: 10px;
+                padding: 5px;
+                background: rgba(115, 120, 121, 0.12);
+            }
+            .online-users li{
+                    list-style: none;
+                    padding: 5px 0;
+                    background: rgba(255, 118, 0, 0.25);
+                    margin: 4px 0;
+                    border-radius: 4px;
+                    font-family: cursive;
+            }
+            .online-users li:before{
+                content: '';
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                background-size: 100%;
+                vertical-align: middle;
+                margin-right: 4px;
+                background-image: url(http://192.168.1.156:8000/Images/online.ico);
+            }
+            .chat-box-wrapper:after {
+                display: block;
+                content: '';
+                clear: both;
+            }
+            .chatbox-header {
+                position: relative;
+                padding: 20px 10px;
+                background: rgba(255, 106, 0, 0.25);
+                box-shadow: 1px 2px 2px rgba(0,0,0,0.5);
+            }
+
+            .chatbox-header h3 {
+                margin: 0;
+            }
+
+            .new-arrival {
+                position: absolute;
+                top: 0;
+                right: 0;
+                background: #eee;
+                width: 150px;
+                height: auto;
+                padding: 10px;
+            }
+            .shareit {
+                float: left;
+                background: rgba(0, 220, 255, 0.57);
+                padding: 14px 10px;
+                border-radius: 10px;
+                width: 180px;
+                position: relative;
+            }
+
+            .form-wrapper:after {
+                content: '';
+                display: block;
+                clear: both;
+            }
+
+            .chat-box img{
+                width: 80% !important;
+                height: auto !important;
+            }
+            .emoji-list {
+                position: absolute;
+                width: 80%;
+                background: #fefefe;
+                padding: 10px;
+                bottom: 38px;
+                left: 0px;
+                box-shadow: 2px 2px 2px rgba(0,0,0,0.5);
+                border-radius: 5px;
+            }
+
+            .emoji-list:after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 0;
+                bottom: -8px;
+                left: 12px;
+                border-left: 15px solid transparent;
+                border-right: 15px solid transparent;
+                border-top: 15px solid #fefefe;
+            }
+            .emoji-list span {
+                cursor: pointer;
+            }
+            input#fileInput {
+                opacity: 0;
+                cursor: pointer !important;
+                width: 50px;
+                height: 20px;
+                position: relative;
+                z-index: 10;
+            }
+
+            .shareit:after {
+                content: '';
+                display: block;
+                position: absolute;
+                top: 5px;
+                left: 8px;
+                cursor: pointer;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-size: 50%;
+                background-color: rgba(0,0,0,0.5);
+                background-position: center;
+                background-repeat: no-repeat;
+                z-index: 8;
+                background-image: url(http://192.168.1.156:8000/Images/share.png);
+            }
+            .online-header h3 {
+                margin: 0;
+            }
+
+            .online-header {
+                padding: 20px 10px;
+                background: rgba(0, 173, 255, 0.28);
+                box-shadow: 0px 2px 2px rgba(0,0,0,0.5);
+                margin-bottom: 5px;
+            }
+        </style>
+        
+    </head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+    var socket = io();
+    </script>
+    <body>
+        <div class="chat-box-wrapper">
+                <div class="chat-wrapper">
+                    <div class="chatbox-header">
+                         <h3>Chat Area</h3>
+                         <!-- <div class="new-arrival"></div> -->
+                    </div>
+                    <div class="chat-box"></div>
+                </div>
+                <div class="online-user-wrapper">
+                    <div class="online-header">
+                        <h3>Online users</h3>
+                    </div>
+                    <div class="online-users">
+                        
+                    </div>
+                </div>
+                
+                
+        </div>
+        <div class="form-wrapper"> 
+            <div class="form-box">
+                <button class="emoji">😀</button>
+                <input type="text"/ id="message" placeholder="type your message...">
+                <button class="send-btn">Send</button>
+                <div class="emoji-list">
+                    <span>😀</span>
+                    <span>😁</span>
+                    <span>😂</span>
+                    <span>😃</span>
+                    <span>😄</span>
+                    <span>😅</span>
+                    <span>😆</span>
+                    <span>😉</span>
+                    <span>😊</span>
+                    <span>😋</span>
+                    <span>😋</span>
+                    <span>😋</span>
+                    <span>😋</span>
+                    <span>😎</span>
+                    <span>😍</span>
+                    <span>😘</span>
+                    <span>😗</span>
+                    <span>😙</span>
+                    <span>🤗</span>
+                    <span>🤔</span>
+                    <span>😐</span>
+                    <span>😑</span>
+                    <span>😶</span>
+                    <span>🙄</span>
+                    <span>😏</span>
+                    <span>😣</span>
+                    <span>😥</span>
+                    <span>🤐</span>
+                    <span>😪</span>
+                    <span>😫</span>
+                    <span>😴</span>
+                    <span>😜</span>
+                    <span>😛</span>
+                    <span>😝</span>
+                </div>
+            </div>
+            <div class="shareit">
+                <input type="file" name="myFile" id="fileInput"/>
+            </div>
+        </div>
+        <script>
+            //My Ip
+            /**
+             * Get the user IP throught the webkitRTCPeerConnection
+             * @param onNewIP {Function} listener function to expose the IP locally
+             * @return undefined
+             */
+            
+            function getUserIP(onNewIP) { //  onNewIp - your listener function for new IPs
+                //compatibility for firefox and chrome
+                var myPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+                var pc = new myPeerConnection({
+                    iceServers: []
+                }),
+                noop = function() {},
+                localIPs = {},
+                ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g,
+                key;
+
+                function iterateIP(ip) {
+                    if (!localIPs[ip]) onNewIP(ip);
+                    localIPs[ip] = true;
+                }
+
+                //create a bogus data channel
+                pc.createDataChannel("");
+
+                // create offer and set local description
+                pc.createOffer(function(sdp) {
+                    sdp.sdp.split('\n').forEach(function(line) {
+                        if (line.indexOf('candidate') < 0) return;
+                        line.match(ipRegex).forEach(iterateIP);
+                    });
+                    
+                    pc.setLocalDescription(sdp, noop, noop);
+                }, noop); 
+
+                //listen for candidate events
+                pc.onicecandidate = function(ice) {
+                    if (!ice || !ice.candidate || !ice.candidate.candidate || !ice.candidate.candidate.match(ipRegex)) return;
+                    ice.candidate.candidate.match(ipRegex).forEach(iterateIP);
+                };
+            }
+
+            $(document).ready(function(){
+                do{
+                        person = prompt("Please enter your name");
+                    }while(person == null || person == "" );
+                    
+                    // $(".chat-box").animate({
+                    // scrollTop: $('.chat-box')[0].scrollHeight - $('.chat-box')[0].clientHeight
+                    // }, 1000);
+
+                    // getting online users
+                        $.ajax(
+                            {
+                            url: "http://192.168.1.156:8000/getOnlineUsers", 
+                            method:'POST',
+
+                            success: function(result){
+                                 console.log(result);
+                                 var str='';
+                                 for(var i=0;i<result.length;i++){
+                                    str+="<li>"+result[i].name+"</li>";
+                                 }
+                                $('.online-users').html(str);
+                            },
+                            error:function(){
+                                console.log("Something wrong");
+                            }
+                        });
+                    //ending online users
+                    //getting IP 
+                    
+                      getUserIP(function(ip){
+                                myIp=ip;
+                                console.log(myIp);
+                                var usrDetail = {name:person,ip:myIp,emp_id:100};
+                                socket.emit('user_connected',usrDetail);
+                        });
+                    
+                    
+                     
+
+                $('.send-btn').click(function(){
+                    
+                    $('.emoji-list').fadeOut(250);
+                    var value = $('#message').val();
+                    if(value!=''){
+                        socket.emit('chat_message',person+" says : "+value);
+                        $('#message').val('');
+                    }
+
+                    // $(".chat-box").animate({
+                    // scrollTop: $('.chat-box')[0].scrollHeight - $('.chat-box')[0].clientHeight
+                    // }, 1000);
+                });
+
+                $(document).keydown(function(event){
+                    
+
+                    if(event.keyCode==13){
+                        $('.emoji-list').fadeOut(250);
+                        var value = $('#message').val();
+                        if(value!=''){
+                            socket.emit('chat_message',person+" says : "+value);
+                            $('#message').val('');
+                        }
+                    }
+
+                    // $(".chat-box").animate({
+                    // scrollTop: $('.chat-box')[0].scrollHeight - $('.chat-box')[0].clientHeight
+                    // }, 1000);
+                });
+
+                socket.on('chat_message', function(msg){
+                    $('.chat-box').append($('<li>').text(msg));
+                    $('new-arrival').addClass('new');
+                    scrollDown();
+                });
+
+                socket.on('prev_msg', function(msg){
+                    for(var i =0;i<msg.length;i++)
+                    {
+                        if(msg[i].indexOf('base64')>=0)
+                            insertImg(msg[i]);
+                        else
+                            $('.chat-box').append($('<li>').text(msg[i]));
+                    }
+                    scrollDown();
+                    
+                });
+
+                 socket.on('online_user', function(result){
+                    var str='';
+                    for(var i=0;i<result.length;i++){
+                        str+="<li>"+result[i].name+"</li>";
+                    }
+                    $('.online-users').html(str);
+                    
+                });
+
+                socket.on('userImage',function(response){
+                    console.log(response);
+                    insertImg(response);
+                });
+
+                
+
+                
+
+                //file upload
+                $('#fileInput').change(function(e){
+                    //Get the first (and only one) file element
+                    //that is included in the original event
+                    var file = e.originalEvent.target.files[0],
+                        reader = new FileReader();
+                    //When the file has been read...
+                    reader.onload = function(evt){
+                        //Because of how the file was read,
+                        //evt.target.result contains the image in base64 format
+                        //Nothing special, just creates an img element
+                        //and appends it to the DOM so my UI shows
+                        //that I posted an image.
+                        //send the image via Socket.io
+                        socket.emit('userImage', evt.target.result);
+                    };
+                    //And now, read the image and base64
+                    reader.readAsDataURL(file); 
+                });
+
+                //emojiss
+                $('.emoji-list').hide();
+                $('button.emoji').click(function(){
+                    $('.emoji-list').fadeToggle(250);
+                });
+
+                $('.emoji-list span').click(function(){
+                    $('#message').val($('#message').val()+$(this).html());
+                });
+
+                function scrollDown(){
+                    var wtf = $('.chat-box');
+                    var height = wtf[0].scrollHeight;
+                    wtf.animate({scrollTop:height},1000);
+                }
+            });
+
+            //inserting image in chat box
+            function insertImg(response){
+                var base64_string = response;
+                    var img = document.createElement("img");
+                    var li = document.createElement("li");
+                    // added `width` , `height` properties to `img` attributes
+                    
+                    img.src = base64_string;
+                    $('.chat-box').append(li);
+                    li.appendChild(img);
+            }
+
+        </script>
+    </body>
+</html>

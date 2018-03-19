@@ -1,0 +1,34 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+        $.post("http://127.0.0.1:8081/process_get",
+        {
+          name: "Donald Duck"
+        },
+        function(data,status){
+        	debugger;
+            alert("Data: " + data + "\nStatus: " + status);
+
+			    var x = document.createElement("IMG");
+			    x.setAttribute("src", data);
+			    x.setAttribute("width", "304");
+			    x.setAttribute("height", "228");
+			    x.setAttribute("alt", "The Pulpit Rock");
+			    document.body.appendChild(x);
+			        });
+			  
+});
+</script>
+</head>
+   <body>
+      
+      <form action = "http://127.0.0.1:8081/process_get" method = "GET">
+         First Name: <input type = "text" name = "first_name">  <br>
+         Last Name: <input type = "text" name = "last_name">
+         <input type = "submit" value = "Submit">
+      </form>
+      
+   </body>
+</html>
